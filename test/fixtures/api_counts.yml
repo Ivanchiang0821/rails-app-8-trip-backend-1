@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  cnt0: 1
+  cnt1: 1
+  cnt2: 1
+  cnt3: 1
+
+two:
+  cnt0: 1
+  cnt1: 1
+  cnt2: 1
+  cnt3: 1
