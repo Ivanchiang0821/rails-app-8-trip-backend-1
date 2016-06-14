@@ -38,6 +38,16 @@ class ApplicationController < ActionController::Base
     JSON.parse(Net::HTTP.get(uri))
   end
 
+  def nearby_search_token(token)
+    google_nearbysearch_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?"
+    pagetoken = "pagetoken=#{token}&"      
+    api_key = "key=#{ENV["google_api_key"]}"
+    url = google_nearbysearch_url + pagetoken + api_key
+    encoded_url = URI.encode(url)
+    uri = URI.parse(encoded_url)
+    JSON.parse(Net::HTTP.get(uri))
+  end
+
   def get_place_detail(pid)
     google_detail_url = "https://maps.googleapis.com/maps/api/place/details/json?language=zh-TW&"
     query_string = "placeid=#{pid}&"

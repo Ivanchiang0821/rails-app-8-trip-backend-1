@@ -20,7 +20,11 @@ module Api
 		    else
 		    	@response = Array.new << get_place_detail(@place["place_id"])
 		    end
+		  end
 
+		  def get_next_page
+		  	ApiCount.first.update(cnt4: ApiCount.first.cnt0 + 1)  
+		  	@response = nearby_search_token(params[:token])
 		  end
 
 		  def search_by_pid
