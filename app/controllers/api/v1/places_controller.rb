@@ -13,10 +13,14 @@ module Api
 		  	# 在使用Google關鍵字得到座標
 		  	# 最後搜尋該座標附近的景點
 		    @place = auto_complete_by_keyword(params[:str])
-		    #if !@place["types"] | @place["types"].include?("geocode")
 		    @coordinate = get_geocode_by_pid(@place["place_id"])
-		    @response = nearby_search_by_coordinate(@coordinate["lat"], @coordinate["lng"], params[:opt])
-		    #end
+		    @search_area_condition = !@place["types"] | @place["types"].include?("geocode")
+		    if @search_area_condition
+		    	@response = nearby_search_by_coordinate(@coordinate["lat"], @coordinate["lng"], params[:opt])
+		    else
+		    	@response = Array.new << get_place_detail(@place["place_id"])
+		    end
+
 		  end
 
 		  def search_by_pid
