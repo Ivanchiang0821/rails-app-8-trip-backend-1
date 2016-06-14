@@ -23,7 +23,7 @@ module Api
 		  end
 
 		  def get_next_page
-		  	ApiCount.first.update(cnt4: ApiCount.first.cnt0 + 1)  
+		  	ApiCount.first.update(cnt4: ApiCount.first.cnt4 + 1)  
 		  	@response = nearby_search_token(params[:token])
 		  end
 
