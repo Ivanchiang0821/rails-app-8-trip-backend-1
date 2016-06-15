@@ -49,7 +49,7 @@ module Api
 		  	@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
 		  end
 
-		  def get_next_page_nearby
+		  def get_next_page_pid
 		  	ApiCount.first.update(cnt4: ApiCount.first.cnt4 + 1)  
 		  	@response = nearby_search_token(params[:token])
 		  	@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
