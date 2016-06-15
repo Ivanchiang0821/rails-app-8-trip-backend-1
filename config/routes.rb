@@ -7,7 +7,7 @@ Rails.application.routes.draw do
       get   'get_detail',            to: 'places#get_detail'   
       get   'get_api_count',         to: 'places#get_api_count'   
       get   'get_next_page_keyword', to: 'places#get_next_page_keyword'          
-      get   'get_next_page_pid',     to: 'places#get_next_page_pid
+      get   'get_next_page_pid',     to: 'places#get_next_page_pid'
     end
   end  
 end
