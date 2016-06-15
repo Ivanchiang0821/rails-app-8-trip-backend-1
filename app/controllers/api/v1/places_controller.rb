@@ -11,6 +11,7 @@ module Api
 		  	ApiCount.first.update(cnt0: ApiCount.first.cnt0 + 1)  
 		  	# 先使用使用者關鍵字對比Google Auto Complete產生新的關鍵字
 		  	# 在使用Google關鍵字搜尋該關鍵字
+
 		    @place = auto_complete_by_keyword(params[:str])
 		    @coordinate = get_geocode_by_pid(@place["place_id"])
 		    @search_area_condition = !@place["types"] | @place["types"].include?("geocode")
@@ -38,8 +39,10 @@ module Api
 		    @distance = get_distance_matrix(origins, destinations)
 
 		    @response["results"].each_with_index do |r, i|
-		    	r["distance"] = @distance[i]["distance"]["text"]
-		    	r["duration"] = @distance[i]["duration"]["text"]
+		    	if @distance[i]["distance"]
+		    		r["distance"] = @distance[i]["distance"]["text"]
+		    		r["duration"] = @distance[i]["duration"]["text"]
+		    	end
 		    end
 				@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
 				@origin_name, @destination_name, @origin_cor, @destination_cor, @distance = get_max_distance(@response["results"])
