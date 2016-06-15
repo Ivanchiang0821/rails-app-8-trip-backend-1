@@ -91,7 +91,8 @@ module Api
 		    des_name  = result[max_j]["name"]
 		    ori_cor = [result[max_i]["geometry"]["location"]["lat"], result[max_i]["geometry"]["location"]["lng"]]
 		    des_cor = [result[max_j]["geometry"]["location"]["lat"], result[max_j]["geometry"]["location"]["lng"]]
-				distance = get_distance_matrix(cor[max_i] * ",", cor[max_j] * ",")[0]["distance"]["value"]
+		    result = get_distance_matrix(cor[max_i] * ",", cor[max_j] * ",")[0]
+				distance = result["distance"]["value"] if result["distance"]
 
 		  	[ori_name, des_name, ori_cor, des_cor, distance]
 		  end
