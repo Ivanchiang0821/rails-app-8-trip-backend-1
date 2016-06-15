@@ -10,22 +10,19 @@ module Api
 		  def search_by_keyword
 		  	ApiCount.first.update(cnt0: ApiCount.first.cnt0 + 1)  
 		  	# 先使用使用者關鍵字對比Google Auto Complete產生新的關鍵字
-		  	# 在使用Google關鍵字得到座標
-		  	# 最後搜尋該座標附近的景點
+		  	# 在使用Google關鍵字搜尋該關鍵字
 		    @place = auto_complete_by_keyword(params[:str])
 		    @coordinate = get_geocode_by_pid(@place["place_id"])
 		    @search_area_condition = !@place["types"] | @place["types"].include?("geocode")
+
 		    if @search_area_condition
-		    	@response = nearby_search_by_coordinate(@coordinate["lat"], @coordinate["lng"], params[:opt])
+		    	@response = text_search(@place["description"], params[:opt])
+		    	@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
 		    else
 		    	@response = Array.new << get_place_detail(@place["place_id"])
 		    end
 		  end
 
-		  def get_next_page
-		  	ApiCount.first.update(cnt4: ApiCount.first.cnt4 + 1)  
-		  	@response = nearby_search_token(params[:token])
-		  end
 
 		  def search_by_pid
 		  	ApiCount.first.update(cnt1: ApiCount.first.cnt1+1)  
@@ -33,7 +30,7 @@ module Api
 		  	# 搜尋該座標附近的景點
 		  	# 利用Distance Matrix API得到離搜尋座標的距離
 		    @coordinate = get_geocode_by_pid(params[:pid])
-		    @response = nearby_search_by_coordinate(@coordinate["lat"], @coordinate["lng"], params[:opt])
+		    @response = nearby_search(@coordinate["lat"], @coordinate["lng"], params[:opt])
 
 		    origins = "#{@coordinate["lat"]}, #{@coordinate["lng"]}"
 		    destinations = @response["results"].map{|r| "#{r["geometry"]["location"]["lat"]},#{r["geometry"]["location"]["lng"]}"}.join("|")
@@ -43,7 +40,19 @@ module Api
 		    	r["distance"] = @distance[i]["distance"]["text"]
 		    	r["duration"] = @distance[i]["duration"]["text"]
 		    end
+			@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
+		  end
 
+		  def get_next_page_keyword
+		  	ApiCount.first.update(cnt4: ApiCount.first.cnt4 + 1)  
+		  	@response = text_search_token(params[:token])
+		  	@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
+		  end
+
+		  def get_next_page_nearby
+		  	ApiCount.first.update(cnt4: ApiCount.first.cnt4 + 1)  
+		  	@response = nearby_search_token(params[:token])
+		  	@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
 		  end
 
 		  def get_pid

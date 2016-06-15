@@ -27,7 +27,29 @@ class ApplicationController < ActionController::Base
     JSON.parse(Net::HTTP.get(uri))["results"].first["geometry"]["location"]    
   end
 
-  def nearby_search_by_coordinate(lat, lng, option)
+  def text_search(keyword, option)
+    google_textsearch_url = "https://maps.googleapis.com/maps/api/place/textsearch/json?language=zh-TW&"
+    search_option = option == "景點" ? "景點" : option == "餐廳" ? "餐廳|美食|小吃|食物" : "便利商店|超市|百貨公司"
+    search_keyword = keyword + search_option
+    query_string = "query=#{search_keyword}&"      
+    api_key = "key=#{ENV["google_api_key"]}"
+    url = google_textsearch_url + query_string + api_key
+    encoded_url = URI.encode(url)
+    uri = URI.parse(encoded_url)
+    JSON.parse(Net::HTTP.get(uri))
+  end
+
+  def text_search_token(token)
+    google_textsearch_url = "https://maps.googleapis.com/maps/api/place/textsearch/json?"
+    pagetoken = "pagetoken=#{token}&"      
+    api_key = "key=#{ENV["google_api_key"]}"
+    url = google_textsearch_url + pagetoken + api_key
+    encoded_url = URI.encode(url)
+    uri = URI.parse(encoded_url)
+    JSON.parse(Net::HTTP.get(uri))
+  end
+
+  def nearby_search(lat, lng, option)
     google_nearbysearch_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?language=zh-TW&"
     keyword = option == "景點" ? "景點" : option == "餐廳" ? "餐廳|美食|小吃|食物" : "便利商店|超市|百貨公司"
     query_string = "location=#{lat},#{lng}&rankby=distance&keyword=#{keyword}&"      
