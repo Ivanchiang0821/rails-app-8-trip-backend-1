@@ -2,6 +2,10 @@ json.next_page_token @response["next_page_token"] if @response["next_page_token"
 json.search_pid params[:pid]
 json.auto_complete_lat @coordinate["lat"]
 json.auto_complete_lng @coordinate["lng"]
+json.max_distance_description @origin_name + "到" + @destination_name 
+json.max_distance @distance
+json.max_distance_origin_cor @origin_cor
+json.max_distance_destination_cor @destination_cor
 
 json.results do |json|
 	json.array!(@response["results"]) do |r|

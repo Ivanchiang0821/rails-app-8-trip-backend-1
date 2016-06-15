@@ -18,6 +18,7 @@ module Api
 		    if @search_area_condition
 		    	@response = text_search(@place["description"], params[:opt])
 		    	@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
+		    	@origin_name, @destination_name, @origin_cor, @destination_cor, @distance = get_max_distance(@response["results"])
 		    else
 		    	@response = Array.new << get_place_detail(@place["place_id"])
 		    end
@@ -40,19 +41,22 @@ module Api
 		    	r["distance"] = @distance[i]["distance"]["text"]
 		    	r["duration"] = @distance[i]["duration"]["text"]
 		    end
-			@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
+				@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
+				@origin_name, @destination_name, @origin_cor, @destination_cor, @distance = get_max_distance(@response["results"])
 		  end
 
 		  def get_next_page_keyword
 		  	ApiCount.first.update(cnt4: ApiCount.first.cnt4 + 1)  
 		  	@response = text_search_token(params[:token])
 		  	@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
+		  	@origin_name, @destination_name, @origin_cor, @destination_cor, @distance = get_max_distance(@response["results"])
 		  end
 
 		  def get_next_page_pid
 		  	ApiCount.first.update(cnt4: ApiCount.first.cnt4 + 1)  
 		  	@response = nearby_search_token(params[:token])
 		  	@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
+		  	@origin_name, @destination_name, @origin_cor, @destination_cor, @distance = get_max_distance(@response["results"])
 		  end
 
 		  def get_pid
@@ -64,6 +68,33 @@ module Api
 		    ApiCount.first.update(cnt3: ApiCount.first.cnt3+1)  		  	
 		    @place = get_place_detail(params[:pid])    
 		  end			
+
+		  def get_max_distance(result)
+
+		    cor = result.map{|r| [r["geometry"]["location"]["lat"], r["geometry"]["location"]["lng"]]}
+		  	max_distance = 0
+		  	max_i = 0
+		  	max_j = 0
+		  	cor.each_with_index do |cor0, i|
+		  		cor.each_with_index do |cor1, j|
+		  			unless i==j 
+		  				distance = (cor0[0] - cor1[0])**2 + (cor0[1] - cor1[1])**2
+		  				if distance > max_distance
+		  					max_distance = distance
+		  					max_i = i
+		  					max_j = j
+		  				end
+		  			end
+		  		end
+		  	end		  	
+		    ori_name = result[max_i]["name"]
+		    des_name  = result[max_j]["name"]
+		    ori_cor = [result[max_i]["geometry"]["location"]["lat"], result[max_i]["geometry"]["location"]["lng"]]
+		    des_cor = [result[max_j]["geometry"]["location"]["lat"], result[max_j]["geometry"]["location"]["lng"]]
+				distance = get_distance_matrix(cor[max_i] * ",", cor[max_j] * ",")[0]["distance"]["value"]
+
+		  	[ori_name, des_name, ori_cor, des_cor, distance]
+		  end
 		end
 	end
 end

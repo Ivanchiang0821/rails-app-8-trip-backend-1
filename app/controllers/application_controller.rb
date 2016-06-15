@@ -88,7 +88,6 @@ class ApplicationController < ActionController::Base
     url = google_distance_url + origins + destinations + api_key
     encoded_url = URI.encode(url)
     uri = URI.parse(encoded_url)
-
     JSON.parse(Net::HTTP.get(uri))["rows"][0]["elements"]
   end 
 
