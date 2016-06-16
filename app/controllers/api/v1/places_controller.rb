@@ -99,8 +99,20 @@ module Api
 
 		  def get_next_page_pid
 		  	ApiCount.first.update(cnt_get_next_page_pid: ApiCount.first.cnt_get_next_page_pid + 1)  
+		  	@coordinate = get_geocode_by_pid(params[:pid])
 		  	@response = nearby_search_token(params[:token])
-		  	@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
+
+		    origins = "#{@coordinate["lat"]}, #{@coordinate["lng"]}"
+		    destinations = @response["results"].map{|r| "#{r["geometry"]["location"]["lat"]},#{r["geometry"]["location"]["lng"]}"}.join("|")
+		    @distance = get_distance_matrix(origins, destinations)
+
+		    @response["results"].each_with_index do |r, i|
+		    	if @distance[i]["distance"]
+		    		r["distance"] = @distance[i]["distance"]["text"]
+		    		r["duration"] = @distance[i]["duration"]["text"]
+		    	end
+		    end
+		 
 		  end
 
 		  def get_pid
