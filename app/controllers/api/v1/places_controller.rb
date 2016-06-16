@@ -12,11 +12,11 @@ module Api
 		  	ApiCount.first.update(cnt_search_by_keyword: ApiCount.first.cnt_search_by_keyword + 1)  
 		    @place = auto_complete_by_keyword(params[:str])
 
-		  	k = KeywordCount.find_by(keyword: params[:str])
+		  	k = KeywordCount.find_by(keyword: params[:str], option: params[:opt])
 		  	if k
 		  		k.update(count: k.count + 1)  
 		  	else
-		  		KeywordCount.create(keyword: params[:str], count: 1, autocomplete: @place ? true : false)
+		  		KeywordCount.create(keyword: params[:str], option: params[:opt], count: 1, autocomplete: @place ? true : false)
 		  	end
 		  	# 先使用使用者關鍵字對比Google Auto Complete產生新的關鍵字
 		  	# 在使用Google關鍵字搜尋該關鍵字
