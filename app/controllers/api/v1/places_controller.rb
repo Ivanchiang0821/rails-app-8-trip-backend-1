@@ -6,6 +6,8 @@ module Api
 		  def get_statistics
 		  	@api_count = ApiCount.first
 		  	@keyword_count = KeywordCount.all
+		  	@pid_count = PidCount.all
+		  	@detail_count = DetailCount.all
 		  end
 
 		  def search_by_keyword
@@ -47,6 +49,14 @@ module Api
 
 		  def search_by_pid
 		  	ApiCount.first.update(cnt_search_by_pid: ApiCount.first.cnt_search_by_pid+1)  
+
+		  	p = PidCount.find_by(pid: params[:pid], option: params[:opt])
+		  	if p
+		  		p.update(count: p.count + 1)  
+		  	else
+		  		PidCount.create(pid: params[:pid], option: params[:opt], count: 1)
+		  	end
+
 		  	# 使用place ID得到座標
 		  	# 搜尋該座標附近的景點
 		  	# 利用Distance Matrix API得到離搜尋座標的距離
@@ -101,6 +111,13 @@ module Api
 		  def get_detail
 		    ApiCount.first.update(cnt_get_detail: ApiCount.first.cnt_get_detail+1)  		  	
 		    @place = get_place_detail(params[:pid])    
+
+		  	d = DetailCount.find_by(pid: params[:pid])
+		  	if d
+		  		d.update(count: d.count + 1)  
+		  	else
+		  		DetailCount.create(pid: params[:pid], name: @place["name"], count: 1)
+		  	end		    
 		  end			
 		  
 		end
