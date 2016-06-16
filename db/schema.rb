@@ -11,19 +11,29 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160614102323) do
+ActiveRecord::Schema.define(version: 20160616083556) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "api_counts", force: :cascade do |t|
-    t.integer  "cnt0",       default: 0
-    t.integer  "cnt1",       default: 0
-    t.integer  "cnt2",       default: 0
-    t.integer  "cnt3",       default: 0
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-    t.integer  "cnt4",       default: 0
+    t.integer  "cnt_search_by_keyword",     default: 0
+    t.integer  "cnt_search_by_pid",         default: 0
+    t.integer  "cnt_search_by_coordinate",  default: 0
+    t.integer  "cnt_get_next_page_pid",     default: 0
+    t.integer  "cnt_get_next_page_keyword", default: 0
+    t.integer  "cnt_get_pid",               default: 0
+    t.integer  "cnt_get_detail",            default: 0
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+  end
+
+  create_table "keyword_counts", force: :cascade do |t|
+    t.string   "keyword"
+    t.integer  "count",        default: 0
+    t.boolean  "autocomplete"
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
   end
 
 end

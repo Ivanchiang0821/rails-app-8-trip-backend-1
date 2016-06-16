@@ -29,8 +29,8 @@ class ApplicationController < ActionController::Base
 
   def text_search(keyword, option)
     google_textsearch_url = "https://maps.googleapis.com/maps/api/place/textsearch/json?language=zh-TW&"
-    search_option = option == "景點" ? "景點" : option == "餐廳" ? "餐廳|美食|小吃|食物" : "便利商店|超市|百貨公司"
-    search_keyword = keyword + search_option
+    search_option = option == "景點" ? "景點" : option == "餐廳" ? "餐廳|美食|小吃|食物" : option == "購物" ? "便利商店|超市|百貨公司" : ""
+    search_keyword = keyword + " " + search_option
     query_string = "query=#{search_keyword}&"      
     api_key = "key=#{ENV["google_api_key"]}"
     url = google_textsearch_url + query_string + api_key
@@ -51,7 +51,7 @@ class ApplicationController < ActionController::Base
 
   def nearby_search(lat, lng, option)
     google_nearbysearch_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?language=zh-TW&"
-    keyword = option == "景點" ? "景點" : option == "餐廳" ? "餐廳|美食|小吃|食物" : "便利商店|超市|百貨公司"
+    keyword = option == "景點" ? "景點" : option == "餐廳" ? "餐廳|美食|小吃|食物" : option == "購物" ? "便利商店|超市|百貨公司" : ""
     query_string = "location=#{lat},#{lng}&rankby=distance&keyword=#{keyword}&"      
     api_key = "key=#{ENV["google_api_key"]}"
     url = google_nearbysearch_url + query_string + api_key
