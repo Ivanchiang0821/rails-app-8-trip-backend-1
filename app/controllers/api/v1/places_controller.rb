@@ -12,7 +12,7 @@ module Api
 
 		  def search_by_keyword
 		  	ApiCount.first.update(cnt_search_by_keyword: ApiCount.first.cnt_search_by_keyword + 1)  
-		    @place = auto_complete_by_keyword(params[:str])
+		    #@place = auto_complete_by_keyword(params[:str])
 
 		  	k = KeywordCount.find_by(keyword: params[:str], option: params[:opt])
 		  	if k
@@ -20,29 +20,32 @@ module Api
 		  	else
 		  		KeywordCount.create(keyword: params[:str], option: params[:opt], count: 1, autocomplete: @place ? true : false)
 		  	end
+
+		  	@response = text_search(params[:str], "") #如果無法match關鍵字, 直接搜尋該字串
+
 		  	# 先使用使用者關鍵字對比Google Auto Complete產生新的關鍵字
 		  	# 在使用Google關鍵字搜尋該關鍵字
 
 
-		    if @place     	
-		    	@coordinate = get_geocode_by_pid(@place["place_id"])
-		    	@search_area_condition = @place["types"].any? { |s| s.include?('administrative_area') || 
-		    																											s.include?('locality') ||
-		    																											s.include?('postal_code')	|| 
-		    																											s.include?('country')}
+		    # if @place     	
+		    # 	@coordinate = get_geocode_by_pid(@place["place_id"])
+		    # 	@search_area_condition = @place["types"].any? { |s| s.include?('administrative_area') || 
+		    # 																											s.include?('locality') ||
+		    # 																											s.include?('postal_code')	|| 
+		    # 																											s.include?('country')}
 
-		    	if @search_area_condition
+		    # 	if @search_area_condition
 
-		    		@response = text_search(@place["description"], params[:opt])
-		    		@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
-		    	else
-		    		@response = Hash.new
-		    		@response["results"] = Array.new << get_place_detail(@place["place_id"])
-		    	end
+		    # 		@response = text_search(@place["description"], params[:opt])
+		    # 		@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
+		    # 	else
+		    # 		@response = Hash.new
+		    # 		@response["results"] = Array.new << get_place_detail(@place["place_id"])
+		    # 	end
 
-		    else
-		    	@response = text_search(params[:str], "") #如果無法match關鍵字, 直接搜尋該字串
-		    end
+		    # else
+		    # 	@response = text_search(params[:str], "") #如果無法match關鍵字, 直接搜尋該字串
+		    # end
 
 		  end
 
