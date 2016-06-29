@@ -32,7 +32,7 @@ module Api
 		    																											s.include?('country') || 
 		    																											s.include?('geocode')}
 		    	if @search_area_condition
-		    		@response = nearby_search(@coordinate["lat"], @coordinate["lng"], params[:opt])
+		    		@response = nearby_search(@coordinate["lat"], @coordinate["lng"], params[:opt])		    		
 		    	else
 		    		@response = Hash.new
 		    		@response["results"] = Array.new << get_place_detail(@place["place_id"])
