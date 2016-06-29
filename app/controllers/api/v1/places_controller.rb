@@ -22,6 +22,7 @@ module Api
 		  	end
 
 		  	@response = text_search(params[:str], params[:opt]) #如果無法match關鍵字, 直接搜尋該字串
+		  	@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
 
 		  	# 先使用使用者關鍵字對比Google Auto Complete產生新的關鍵字
 		  	# 在使用Google關鍵字搜尋該關鍵字
