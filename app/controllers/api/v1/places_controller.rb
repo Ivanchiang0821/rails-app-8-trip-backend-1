@@ -26,7 +26,19 @@ module Api
 		    if @response["results"].count == 1
 		    	@place = auto_complete_by_keyword(@response["results"].first["name"])
 		    	@coordinate = get_geocode_by_pid(@place["place_id"])
-		    	@response = nearby_search(@coordinate["lat"], @coordinate["lng"], params[:opt])
+		    	@search_area_condition = @place["types"].any? { |s| s.include?('administrative_area') || 
+		    																											s.include?('locality') ||
+		    																											s.include?('postal_code')	|| 
+		    																											s.include?('country') || 
+		    																											s.include?('geocode')}
+		    	if @search_area_condition
+		    		@response = nearby_search(@coordinate["lat"], @coordinate["lng"], params[:opt])
+		    	else
+		    		@response = Hash.new
+		    		@response["results"] = Array.new << get_place_detail(@place["place_id"])
+		    	end
+
+		    	
 		    end
 				@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
 
