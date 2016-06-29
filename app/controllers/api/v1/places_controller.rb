@@ -23,7 +23,7 @@ module Api
 
 		  	@response = text_search(params[:str], params[:opt]) 
 
-		    if @response["results"].count < 5
+		    if @response["results"].count > 0 and @response["results"].count < 5
 		    	@place1 = auto_complete_by_keyword(@response["results"].first["name"])
 		    	@place2 = auto_complete_by_keyword(params[:str])
 		    	@coordinate1 = get_geocode_by_pid(@place1["place_id"])
@@ -46,8 +46,8 @@ module Api
 		    		@response = Hash.new
 		    		@response["results"] = Array.new << get_place_detail(@place1["place_id"])
 		    	end
-
-		    	
+		    elsif @response["results"].count == 0
+		    	@response = text_search(params[:str], "") #如果無法match關鍵字, 直接搜尋該字串		    	
 		    end
 				@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
 
