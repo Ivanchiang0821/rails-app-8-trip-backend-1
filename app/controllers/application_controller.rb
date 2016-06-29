@@ -28,15 +28,43 @@ class ApplicationController < ActionController::Base
   end
 
   def text_search(keyword, option)
-    google_textsearch_url = "https://maps.googleapis.com/maps/api/place/textsearch/json?language=zh-TW&"
-    search_option = option == "景點" ? "attractions" : option == "餐廳" ? "餐廳|美食|小吃|食物|Food" : option == "購物" ? "便利商店|超市|百貨公司|Shopping" : ""
-    search_keyword = keyword + " " + search_option
-    query_string = "query=#{search_keyword}&"      
-    api_key = "key=#{ENV["google_api_key"]}"
-    url = google_textsearch_url + query_string + api_key
-    encoded_url = URI.encode(url)
-    uri = URI.parse(encoded_url)
-    JSON.parse(Net::HTTP.get(uri))
+    if option == "景點"
+      google_textsearch_url = "https://maps.googleapis.com/maps/api/place/textsearch/json?language=zh-TW&"
+      search_option = "景點"
+      search_keyword = keyword + " " + search_option
+      query_string = "query=#{search_keyword}&"      
+      api_key = "key=#{ENV["google_api_key"]}"
+      url = google_textsearch_url + query_string + api_key
+      encoded_url = URI.encode(url)
+      uri = URI.parse(encoded_url)
+      result1 = JSON.parse(Net::HTTP.get(uri))
+
+      search_option = "attractions"      
+      search_keyword = keyword + " " + search_option
+      query_string = "query=#{search_keyword}&"      
+      api_key = "key=#{ENV["google_api_key"]}"
+      url = google_textsearch_url + query_string + api_key
+      encoded_url = URI.encode(url)
+      uri = URI.parse(encoded_url)
+      result2 = JSON.parse(Net::HTTP.get(uri))
+
+      if result1["results"].count >= result2["results"].count
+        result1
+      else
+        result2
+      end
+
+    else
+      google_textsearch_url = "https://maps.googleapis.com/maps/api/place/textsearch/json?language=zh-TW&"
+      search_option = option == "餐廳" ? "餐廳|美食|小吃|食物|Food" : option == "購物" ? "便利商店|超市|百貨公司|Shopping" : ""
+      search_keyword = keyword + " " + search_option
+      query_string = "query=#{search_keyword}&"      
+      api_key = "key=#{ENV["google_api_key"]}"
+      url = google_textsearch_url + query_string + api_key
+      encoded_url = URI.encode(url)
+      uri = URI.parse(encoded_url)
+      JSON.parse(Net::HTTP.get(uri))
+    end
   end
 
   def text_search_token(token)
