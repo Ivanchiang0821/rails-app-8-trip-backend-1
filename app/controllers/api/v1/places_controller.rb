@@ -23,16 +23,25 @@ module Api
 
 		  	@response = text_search(params[:str], params[:opt]) 
 
-		    if @response["results"].count == 1
-		    	@place = auto_complete_by_keyword(@response["results"].first["name"])
-		    	@coordinate = get_geocode_by_pid(@place["place_id"])
-		    	@search_area_condition = @place["types"].any? { |s| s.include?('administrative_area') || 
-		    																											s.include?('locality') ||
-		    																											s.include?('postal_code')	|| 
-		    																											s.include?('country') || 
-		    																											s.include?('geocode')}
-		    	if @search_area_condition
-		    		@response = nearby_search(@coordinate["lat"], @coordinate["lng"], params[:opt])		    		
+		    if @response["results"].count < 5
+		    	@place1 = auto_complete_by_keyword(@response["results"].first["name"])
+		    	@place2 = auto_complete_by_keyword(params[:str])
+		    	@coordinate1 = get_geocode_by_pid(@place1["place_id"])
+		    	@coordinate2 = get_geocode_by_pid(@place2["place_id"])
+		    	@search_area_condition1 = @place1["types"].any? { |s| s.include?('administrative_area') || 
+		    																		 				  					s.include?('locality') ||
+		    																											  s.include?('postal_code')	|| 
+		    																		 									  s.include?('country') || 
+		    																											  s.include?('geocode')}
+		    	@search_area_condition2 = @place2["types"].any? { |s| s.include?('administrative_area') || 
+		    																											  s.include?('locality') ||
+		    																											  s.include?('postal_code')	|| 
+		    																											  s.include?('country') || 
+		    																											  s.include?('geocode')}		    																											
+		    	if @search_area_condition1
+		    		@response = nearby_search(@coordinate1["lat"], @coordinate1["lng"], params[:opt])		    
+		    	elsif @search_area_condition2
+		    		@response = nearby_search(@coordinate2["lat"], @coordinate2["lng"], params[:opt])				    				
 		    	else
 		    		@response = Hash.new
 		    		@response["results"] = Array.new << get_place_detail(@place["place_id"])
