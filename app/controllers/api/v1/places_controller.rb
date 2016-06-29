@@ -44,7 +44,7 @@ module Api
 		    		@response = nearby_search(@coordinate2["lat"], @coordinate2["lng"], params[:opt])				    				
 		    	else
 		    		@response = Hash.new
-		    		@response["results"] = Array.new << get_place_detail(@place["place_id"])
+		    		@response["results"] = Array.new << get_place_detail(@place1["place_id"])
 		    	end
 
 		    	
