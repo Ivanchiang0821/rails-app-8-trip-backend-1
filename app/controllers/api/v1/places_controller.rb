@@ -24,30 +24,47 @@ module Api
 		  	@response = text_search(params[:str], params[:opt]) 
 
 		    if @response["results"].count > 0 and @response["results"].count < 5
-		    	@place1 = auto_complete_by_keyword(@response["results"].first["name"])
+		    	@place1 = auto_complete_by_keyword(@response["results"].first["name"]) if @response["results"].count == 1
 		    	@place2 = auto_complete_by_keyword(params[:str])
-		    	@coordinate1 = get_geocode_by_pid(@place1["place_id"])
-		    	@coordinate2 = get_geocode_by_pid(@place2["place_id"])
+		    	@coordinate1 = get_geocode_by_pid(@place1["place_id"]) if @place1
+		    	@coordinate2 = get_geocode_by_pid(@place2["place_id"]) if @place2
 		    	@search_area_condition1 = @place1["types"].any? { |s| s.include?('administrative_area') || 
 		    																		 				  					s.include?('locality') ||
 		    																											  s.include?('postal_code')	|| 
 		    																		 									  s.include?('country') || 
-		    																											  s.include?('geocode')}
+		    																											  s.include?('geocode')} if @place1
 		    	@search_area_condition2 = @place2["types"].any? { |s| s.include?('administrative_area') || 
 		    																											  s.include?('locality') ||
 		    																											  s.include?('postal_code')	|| 
 		    																											  s.include?('country') || 
-		    																											  s.include?('geocode')}		    																											
+		    																											  s.include?('geocode')} if @place2
+																									
 		    	if @search_area_condition1
 		    		@response = nearby_search(@coordinate1["lat"], @coordinate1["lng"], params[:opt])		    
 		    	elsif @search_area_condition2
 		    		@response = nearby_search(@coordinate2["lat"], @coordinate2["lng"], params[:opt])				    				
-		    	else
+		    	elsif @response["results"].count == 1
 		    		@response = Hash.new
 		    		@response["results"] = Array.new << get_place_detail(@place1["place_id"])
-		    	end
+		    	end   
 		    elsif @response["results"].count == 0
-		    	@response = text_search(params[:str], "") #如果無法match關鍵字, 直接搜尋該字串		    	
+
+		    	@response = text_search(params[:str], "") 
+			    if @response["results"].count == 1
+			    	@place = auto_complete_by_keyword(@response["results"].first["name"])
+			    	@coordinate = get_geocode_by_pid(@place["place_id"]) 
+			    	@search_area_condition = @place["types"].any? { |s| s.include?('administrative_area') || 
+			    																		 				  				s.include?('locality') ||
+			    																										  s.include?('postal_code')	|| 
+			    																		 								  s.include?('country') || 
+			    																										  s.include?('geocode')}	    																											
+			    	if @search_area_condition
+			    		@response = nearby_search(@coordinate["lat"], @coordinate["lng"], params[:opt])		    		    				
+			    	elsif @response["results"].count == 1
+			    		@response = Hash.new
+			    		@response["results"] = Array.new << get_place_detail(@place["place_id"])
+			    	end  
+			    end
 		    end
 				@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
 
