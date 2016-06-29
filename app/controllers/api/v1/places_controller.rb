@@ -12,7 +12,7 @@ module Api
 
 		  def search_by_keyword
 		  	ApiCount.first.update(cnt_search_by_keyword: ApiCount.first.cnt_search_by_keyword + 1)  
-		    #@place = auto_complete_by_keyword(params[:str])
+		    @place = auto_complete_by_keyword(params[:str])
 
 		  	k = KeywordCount.find_by(keyword: params[:str], option: params[:opt])
 		  	if k
