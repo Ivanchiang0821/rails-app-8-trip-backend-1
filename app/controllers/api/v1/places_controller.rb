@@ -21,8 +21,14 @@ module Api
 		  		KeywordCount.create(keyword: params[:str], option: params[:opt], count: 1, autocomplete: @place ? true : false)
 		  	end
 
-		  	@response = text_search(params[:str], params[:opt]) #如果無法match關鍵字, 直接搜尋該字串
-		  	@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
+		  	@response = text_search(params[:str], params[:opt]) 
+
+		    if @response["results"].count == 1
+		    	@place = auto_complete_by_keyword(@response["results"].first["name"])
+		    	@coordinate = get_geocode_by_pid(@place["place_id"])
+		    	@response = nearby_search(@coordinate["lat"], @coordinate["lng"], params[:opt])
+		    end
+				@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
 
 		  	# 先使用使用者關鍵字對比Google Auto Complete產生新的關鍵字
 		  	# 在使用Google關鍵字搜尋該關鍵字
