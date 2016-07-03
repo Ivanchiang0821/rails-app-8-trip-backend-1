@@ -21,6 +21,9 @@ gem 'responders', '~> 2.0'
 # For security key
 gem "figaro"
 
+# For crawl
+gem 'nokogiri'
+
 group :development do
   gem 'pry'  
 end

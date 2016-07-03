@@ -119,4 +119,35 @@ class ApplicationController < ActionController::Base
     JSON.parse(Net::HTTP.get(uri))["rows"][0]["elements"]
   end 
 
+  def get_tripadvisor_info(str)
+    require 'open-uri'
+    google_link = "https://www.google.com.tw/search?q=" "tripadvisor" + "+" + str + "+" + "10大最佳旅遊景點"  
+    encoded_url = URI.encode(google_link)
+    uri = URI.parse(encoded_url)    
+    doc1 = Nokogiri::HTML(open(uri), nil, "big5")      
+
+    tripadvisor_judge = "/url?q=https://www.tripadvisor.com.tw/Attractions"
+    check = doc1.css("a").select{|a| [str,"大最佳旅遊景點"].all?{|s| a.children.text.include?(s)}}
+
+    if check.count > 0
+      tripadvisor_link = check[0].attributes["href"].value[7..-1]   
+      doc2 = Nokogiri::HTML(open(tripadvisor_link))      
+
+      trip_arr = []
+      doc2.css("div.attraction_element").each_with_index do |a, i|
+        tmp = Hash.new
+        tmp["order"] = (i + 1).to_s
+        tmp["title"] = a.css("div.property_title a")[0].text
+        tmp["link"] = "https://www.tripadvisor.com.tw" + a.css("div.property_title a")[0]["href"]
+        tmp["rate"] = a.css("span.rate img")[0]["alt"].gsub("分","") if a.css("span.rate img")
+        tmp["review"] = a.css("span.more a")[0].text.gsub("\n","").gsub("則評論","") if a.css("span.more a")[0]
+        trip_arr << tmp
+      end
+      trip_arr    
+    else
+      []
+    end
+
+  end
+
 end

@@ -2,18 +2,6 @@ json.results_count @response["results"].count
 
 if @response["results"].count > 0
 	json.search_str params[:str]
-	if @place
-		json.auto_complete_str  @place["description"]
-		json.auto_complete_lat  @coordinate["lat"]
-		json.auto_complete_lng  @coordinate["lng"]
-		json.auto_complete_type @place["types"]
-	else
-		json.auto_complete_str  ""
-		json.auto_complete_lat  ""
-		json.auto_complete_lng  ""
-		json.auto_complete_type ""
-	end	
-
 	json.next_page_token @response["next_page_token"] if @response["next_page_token"]    
 
 	json.results do |json|
@@ -40,6 +28,18 @@ else
 	json.search_str params[:str]
 	json.results do |json|
 		json.array!(@response["results"]) do |r|
+		end
+	end
+end
+
+if @response["tripadvisor"].count > 0
+	json.tripadvisor do |json|
+		json.array!(@response["tripadvisor"]) do |t|
+			json.order    t["order"]
+			json.title    t["title"]
+			json.link     t["link"]
+			json.rate     t["rate"]
+			json.review   t["review"]
 		end
 	end
 end

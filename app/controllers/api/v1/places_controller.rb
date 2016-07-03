@@ -1,7 +1,7 @@
 module Api
 	module V1
 		class PlacesController < ApplicationController
-			respond_to :json
+		  respond_to :json
 
 		  def get_statistics
 		  	@api_count = ApiCount.first
@@ -67,6 +67,9 @@ module Api
 			    end
 		    end
 				@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
+		  	
+		  	tripadvisor_result = get_tripadvisor_info(params[:str])
+		  	@response["tripadvisor"] = tripadvisor_result
 
 		  	# 先使用使用者關鍵字對比Google Auto Complete產生新的關鍵字
 		  	# 在使用Google關鍵字搜尋該關鍵字
