@@ -139,9 +139,10 @@ class ApplicationController < ActionController::Base
         tmp["order"] = (i + 1).to_s
         tmp["title"] = a.css("div.property_title a")[0].text
         tmp["link"] = "https://www.tripadvisor.com.tw" + a.css("div.property_title a")[0]["href"]
-        tmp["rate"] = a.css("span.rate img")[0]["alt"].gsub("分","") if a.css("span.rate img")
-        tmp["review"] = a.css("span.more a")[0].text.gsub("\n","").gsub("則評論","") if a.css("span.more a")[0]
+        tmp["rate"] = a.css("span.rate img")[0] ? a.css("span.rate img")[0]["alt"].gsub("分","") : 0.to_s
+        tmp["review"] = a.css("span.more a")[0] ? a.css("span.more a")[0].text.gsub("\n","").gsub("則評論","") : 0.to_s
         trip_arr << tmp
+
       end
       trip_arr    
     else
