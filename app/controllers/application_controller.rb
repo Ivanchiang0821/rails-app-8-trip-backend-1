@@ -48,7 +48,9 @@ class ApplicationController < ActionController::Base
       uri = URI.parse(encoded_url)
       result2 = JSON.parse(Net::HTTP.get(uri))
 
-      if result1["results"].count >= result2["results"].count
+      if result2["results"].count == 1 
+        result2
+      elsif result1["results"].count || result1["results"].count >= result2["results"].count
         result1
       else
         result2

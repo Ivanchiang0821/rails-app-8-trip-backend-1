@@ -23,7 +23,7 @@ module Api
 
 		  	@response = text_search(params[:str], params[:opt]) 
 
-		    if @response["results"].count > 0 and @response["results"].count < 5
+		    if @response["results"].count > 0 and @response["results"].count < 5 and @response["results"].count != 1
 		    	@place1 = auto_complete_by_keyword(@response["results"].first["name"]) if @response["results"].count == 1
 		    	@place2 = auto_complete_by_keyword(params[:str])
 		    	@coordinate1 = get_geocode_by_pid(@place1["place_id"]) if @place1
