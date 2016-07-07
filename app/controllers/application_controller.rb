@@ -153,4 +153,18 @@ class ApplicationController < ActionController::Base
 
   end
 
+  def google_translate(keyword_array)
+    google_translate_url = "https://www.googleapis.com/language/translate/v2?"
+    api_key = "key=#{ENV["google_api_key"]}"
+    target_language = "&target=zh-TW" 
+    query_string = "&"
+    keyword_array.each do |k|
+      query_string = query_string + "q=#{k}&"
+    end
+    url = google_translate_url + api_key + target_language + query_string
+    encoded_url = URI.encode(url)
+    uri = URI.parse(encoded_url)
+    JSON.parse(Net::HTTP.get(uri))["data"]["translations"].map{|d| d["translatedText"]}
+  end
+
 end

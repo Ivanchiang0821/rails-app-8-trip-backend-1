@@ -66,8 +66,13 @@ module Api
 			    	end  
 			    end
 		    end
-				@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
-		  	
+			@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
+		  	translate_results = google_translate(@response["results"].map{|r| r["name"]})
+		  	@response["results"].each_with_index do |r, i|
+		  		r["ori_name"] = r["name"]
+		  		r["name"] = translate_results[i]
+		  	end
+
 		  	tripadvisor_result = get_tripadvisor_info(params[:str])
 		  	@response["tripadvisor"] = tripadvisor_result
 
@@ -124,6 +129,12 @@ module Api
 		    		r["duration"] = @distance[i]["duration"]["text"]
 		    	end
 		    end
+
+		  	translate_results = google_translate(@response["results"].map{|r| r["name"]})
+		  	@response["results"].each_with_index do |r, i|
+		  		r["ori_name"] = r["name"]
+		  		r["name"] = translate_results[i]
+		  	end		    
 		  end
 
 		  def search_by_coordinate
@@ -139,13 +150,25 @@ module Api
 		    		r["distance"] = @distance[i]["distance"]["text"]
 		    		r["duration"] = @distance[i]["duration"]["text"]
 		    	end
-		    end		  	
+		    end		
+
+		  	translate_results = google_translate(@response["results"].map{|r| r["name"]})
+		  	@response["results"].each_with_index do |r, i|
+		  		r["ori_name"] = r["name"]
+		  		r["name"] = translate_results[i]
+		  	end		      	
 		  end
 
 		  def get_next_page_keyword
 		  	ApiCount.first.update(cnt_get_next_page_keyword: ApiCount.first.cnt_get_next_page_keyword + 1)  
 		  	@response = text_search_token(params[:token])
 		  	@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
+
+		  	translate_results = google_translate(@response["results"].map{|r| r["name"]})
+		  	@response["results"].each_with_index do |r, i|
+		  		r["ori_name"] = r["name"]
+		  		r["name"] = translate_results[i]
+		  	end		  	
 		  end
 
 		  def get_next_page_pid
@@ -163,6 +186,12 @@ module Api
 		    		r["duration"] = @distance[i]["duration"]["text"]
 		    	end
 		    end
+
+		  	translate_results = google_translate(@response["results"].map{|r| r["name"]})
+		  	@response["results"].each_with_index do |r, i|
+		  		r["ori_name"] = r["name"]
+		  		r["name"] = translate_results[i]
+		  	end		    
 		 
 		  end
 
@@ -174,6 +203,10 @@ module Api
 		  def get_detail
 		    ApiCount.first.update(cnt_get_detail: ApiCount.first.cnt_get_detail+1)  		  	
 		    @place = get_place_detail(params[:pid])    
+
+		  	translate_result = google_translate([@place["name"]])
+		  	@place["ori_name"] = @place["name"] 
+		  	@place["name"] = translate_result.first
 
 		  	d = DetailCount.find_by(pid: params[:pid])
 		  	if d

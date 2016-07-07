@@ -6,6 +6,7 @@ if @response["results"].count > 0
 
 	json.results do |json|
 		json.array!(@response["results"]) do |r|
+			json.ori_name r["ori_name"]
 			json.name     r["name"]
 			json.address  r["formatted_address"]
 			json.lat      r["geometry"]["location"]["lat"]

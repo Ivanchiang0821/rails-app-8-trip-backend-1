@@ -5,6 +5,7 @@ json.auto_complete_lng @coordinate["lng"]
 
 json.results do |json|
 	json.array!(@response["results"]) do |r|
+		json.ori_name r["ori_name"]
 		json.name     r["name"]
 		json.address  r["vicinity"]
 		json.lat      r["geometry"]["location"]["lat"]
