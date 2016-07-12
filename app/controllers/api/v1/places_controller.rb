@@ -11,13 +11,6 @@ module Api
 		  end
 
 		  def search_by_keyword
-		  	if params[:str].empty?
-		  		english_name = [params[:str]]
-		  	else
-		  		chinese_name, english_name = google_translate([params[:str]])
-		  	end
-		  	english_name = english_name.first
-
 		  	ApiCount.first.update(cnt_search_by_keyword: ApiCount.first.cnt_search_by_keyword + 1)  
 		    #@place = auto_complete_by_keyword(params[:str])
 
@@ -28,11 +21,11 @@ module Api
 		  		KeywordCount.create(keyword: params[:str], option: params[:opt], count: 1, autocomplete: @place ? true : false)
 		  	end
 
-		  	@response = text_search(english_name, params[:opt]) 
+		  	@response = text_search(params[:str], params[:opt]) 
 
 		    if @response["results"].count > 0 and @response["results"].count < 5 and @response["results"].count != 1
 		    	@place1 = auto_complete_by_keyword(@response["results"].first["name"]) if @response["results"].count == 1
-		    	@place2 = auto_complete_by_keyword(english_name)
+		    	@place2 = auto_complete_by_keyword(params[:str])
 		    	@coordinate1 = get_geocode_by_pid(@place1["place_id"]) if @place1
 		    	@coordinate2 = get_geocode_by_pid(@place2["place_id"]) if @place2
 		    	@search_area_condition1 = @place1["types"].any? { |s| s.include?('administrative_area') || 
@@ -56,7 +49,7 @@ module Api
 		    	end   
 		    elsif @response["results"].count == 0
 
-		    	@response = text_search(english_name, "") 
+		    	@response = text_search(params[:str], "") 
 			    if @response["results"].count == 1
 			    	@place = auto_complete_by_keyword(@response["results"].first["name"])
 			    	@coordinate = get_geocode_by_pid(@place["place_id"]) 
