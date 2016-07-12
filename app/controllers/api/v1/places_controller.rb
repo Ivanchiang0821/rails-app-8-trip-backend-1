@@ -63,7 +63,15 @@ module Api
 			    	elsif @response["results"].count == 1
 			    		@response = Hash.new
 			    		@response["results"] = Array.new << get_place_detail(@place["place_id"])
-			    	end  
+			    	end
+			    elsif @response["results"].count == 0
+				  	if params[:str].empty?
+				  		english_name = [params[:str]]
+				  	else
+				  		chinese_name, english_name = google_translate([params[:str]])
+				  	end
+				  	english_name = english_name.first	
+				  	@response = text_search(english_name, "") 		    	
 			    end
 		    end
 			@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
