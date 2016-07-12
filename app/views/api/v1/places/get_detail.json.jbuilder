@@ -1,5 +1,6 @@
 json.ori_name           @place["ori_name"]
 json.name               @place["name"]
+json.eng_name           @place["eng_name"]
 json.address            @place["formatted_address"] if @place["formatted_address"]
 json.phone              @place["formatted_phone_number"] if @place["formatted_phone_number"]
 json.website            @place["website"] if @place["website"]        

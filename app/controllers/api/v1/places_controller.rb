@@ -11,6 +11,13 @@ module Api
 		  end
 
 		  def search_by_keyword
+		  	if params[:str].empty?
+		  		english_name = [params[:str]]
+		  	else
+		  		chinese_name, english_name = google_translate([params[:str]])
+		  	end
+		  	english_name = english_name.first
+
 		  	ApiCount.first.update(cnt_search_by_keyword: ApiCount.first.cnt_search_by_keyword + 1)  
 		    #@place = auto_complete_by_keyword(params[:str])
 
@@ -21,11 +28,11 @@ module Api
 		  		KeywordCount.create(keyword: params[:str], option: params[:opt], count: 1, autocomplete: @place ? true : false)
 		  	end
 
-		  	@response = text_search(params[:str], params[:opt]) 
+		  	@response = text_search(english_name, params[:opt]) 
 
 		    if @response["results"].count > 0 and @response["results"].count < 5 and @response["results"].count != 1
 		    	@place1 = auto_complete_by_keyword(@response["results"].first["name"]) if @response["results"].count == 1
-		    	@place2 = auto_complete_by_keyword(params[:str])
+		    	@place2 = auto_complete_by_keyword(english_name)
 		    	@coordinate1 = get_geocode_by_pid(@place1["place_id"]) if @place1
 		    	@coordinate2 = get_geocode_by_pid(@place2["place_id"]) if @place2
 		    	@search_area_condition1 = @place1["types"].any? { |s| s.include?('administrative_area') || 
@@ -49,7 +56,7 @@ module Api
 		    	end   
 		    elsif @response["results"].count == 0
 
-		    	@response = text_search(params[:str], "") 
+		    	@response = text_search(english_name, "") 
 			    if @response["results"].count == 1
 			    	@place = auto_complete_by_keyword(@response["results"].first["name"])
 			    	@coordinate = get_geocode_by_pid(@place["place_id"]) 
@@ -67,10 +74,11 @@ module Api
 			    end
 		    end
 			@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
-		  	translate_results = google_translate(@response["results"].map{|r| r["name"]})
+		  	chinese_results, english_results = google_translate(@response["results"].map{|r| r["name"]}) if @response["results"].count > 0
 		  	@response["results"].each_with_index do |r, i|
 		  		r["ori_name"] = r["name"]
-		  		r["name"] = translate_results[i]
+		  		r["name"] = chinese_results[i]
+		  		r["eng_name"] = english_results[i]
 		  	end
 
 		  	tripadvisor_result = get_tripadvisor_info(params[:str])
@@ -130,11 +138,12 @@ module Api
 		    	end
 		    end
 
-		  	translate_results = google_translate(@response["results"].map{|r| r["name"]})
+		  	chinese_results, english_results = google_translate(@response["results"].map{|r| r["name"]})
 		  	@response["results"].each_with_index do |r, i|
 		  		r["ori_name"] = r["name"]
-		  		r["name"] = translate_results[i]
-		  	end		    
+		  		r["name"] = chinese_results[i]
+		  		r["eng_name"] = english_results[i]
+		  	end
 		  end
 
 		  def search_by_coordinate
@@ -152,11 +161,12 @@ module Api
 		    	end
 		    end		
 
-		  	translate_results = google_translate(@response["results"].map{|r| r["name"]})
+		  	chinese_results, english_results = google_translate(@response["results"].map{|r| r["name"]})
 		  	@response["results"].each_with_index do |r, i|
 		  		r["ori_name"] = r["name"]
-		  		r["name"] = translate_results[i]
-		  	end		      	
+		  		r["name"] = chinese_results[i]
+		  		r["eng_name"] = english_results[i]
+		  	end	      	
 		  end
 
 		  def get_next_page_keyword
@@ -164,11 +174,12 @@ module Api
 		  	@response = text_search_token(params[:token])
 		  	@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
 
-		  	translate_results = google_translate(@response["results"].map{|r| r["name"]})
+		  	chinese_results, english_results = google_translate(@response["results"].map{|r| r["name"]})
 		  	@response["results"].each_with_index do |r, i|
 		  		r["ori_name"] = r["name"]
-		  		r["name"] = translate_results[i]
-		  	end		  	
+		  		r["name"] = chinese_results[i]
+		  		r["eng_name"] = english_results[i]
+		  	end	  	
 		  end
 
 		  def get_next_page_pid
@@ -187,16 +198,17 @@ module Api
 		    	end
 		    end
 
-		  	translate_results = google_translate(@response["results"].map{|r| r["name"]})
+		  	chinese_results, english_results = google_translate(@response["results"].map{|r| r["name"]})
 		  	@response["results"].each_with_index do |r, i|
 		  		r["ori_name"] = r["name"]
-		  		r["name"] = translate_results[i]
-		  	end		    
+		  		r["name"] = chinese_results[i]
+		  		r["eng_name"] = english_results[i]
+		  	end    
 		 
 		  end
 
 		  def get_pid
-			ApiCount.first.update(cnt_get_pid: ApiCount.first.cnt_get_pid+1)  		    		  	
+				ApiCount.first.update(cnt_get_pid: ApiCount.first.cnt_get_pid+1)  		    		  	
 		    @place = auto_complete_by_keyword(params[:str])    
 		  end
 
@@ -204,9 +216,10 @@ module Api
 		    ApiCount.first.update(cnt_get_detail: ApiCount.first.cnt_get_detail+1)  		  	
 		    @place = get_place_detail(params[:pid])    
 
-		  	translate_result = google_translate([@place["name"]])
+		  	chinese_result, english_result = google_translate([@place["name"]])
 		  	@place["ori_name"] = @place["name"] 
-		  	@place["name"] = translate_result.first
+		  	@place["name"] = chinese_result.first
+		  	@place["eng_name"] = english_result.first
 
 		  	d = DetailCount.find_by(pid: params[:pid])
 		  	if d
