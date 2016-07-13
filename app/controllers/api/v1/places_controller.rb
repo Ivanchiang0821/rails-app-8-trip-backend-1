@@ -88,15 +88,20 @@ module Api
 		  		r["eng_name"] = english_results[i]
 		  	end
 
+		  	tripadvisor_result = get_tripadvisor_info(params[:str])
+		  	@response["tripadvisor"] = tripadvisor_result
+
+
 		  	k = KeywordCount.find_by(keyword: params[:str], option: params[:opt])
 		  	if k
 		  		k.update(count: k.count + 1)  
 		  	else
-		  		KeywordCount.create(keyword: params[:str], option: params[:opt], count: 1, debug: @debug, r_count: @response["results"].count, autocomplete: @place ? true : false)
-		  	end
-
-		  	tripadvisor_result = get_tripadvisor_info(params[:str])
-		  	@response["tripadvisor"] = tripadvisor_result
+		  		KeywordCount.create(keyword: params[:str], option: params[:opt], 
+		  			                  count: 1, debug: @debug, 
+		  			                  r_count: @response["results"].count, 
+		  			                  ta_count: @response["tripadvisor"].count, 
+		  			                  autocomplete: @place ? true : false)
+		  	end		  	
 		  end
 
 
