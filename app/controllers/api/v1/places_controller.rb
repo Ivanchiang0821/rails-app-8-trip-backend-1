@@ -23,7 +23,7 @@ module Api
 @debug = 888
 
 		  	if @response["results"].count == 1 && (@place.nil? || (@place && !@search_area_condition))
-	    		@debug = 01
+	    		@debug = 21
 		  	else 
 		  		@response = text_search(params[:str], params[:opt]) 
 
@@ -63,7 +63,7 @@ module Api
 			    		else
 				    		@response = Hash.new
 				    		@response["results"] = Array.new << get_place_detail(@place["place_id"])
-				    		@debug = 02
+				    		@debug = 22
 			    		end    
 			    	else
 					  	if params[:str].empty?
@@ -73,7 +73,7 @@ module Api
 					  	end
 					  	english_name = english_name.first	
 					  	@response = text_search(english_name, params[:opt]) 	
-					  	@debug = 21
+					  	@debug = 31
 				    end
 				  else
 				    @debug = 11
