@@ -133,18 +133,20 @@ class ApplicationController < ActionController::Base
 
     if check.count > 0
       tripadvisor_link = check[0].attributes["href"].value[7..-1]   
-      doc2 = Nokogiri::HTML(open(tripadvisor_link))      
 
       trip_arr = []
-      doc2.css("div.attraction_element").each_with_index do |a, i|
-        tmp = Hash.new
-        tmp["order"] = (i + 1).to_s
-        tmp["title"] = a.css("div.property_title a")[0].text
-        tmp["link"] = "https://www.tripadvisor.com.tw" + a.css("div.property_title a")[0]["href"]
-        tmp["rate"] = a.css("span.rate img")[0] ? a.css("span.rate img")[0]["alt"].gsub("分","") : 0.to_s
-        tmp["review"] = a.css("span.more a")[0] ? a.css("span.more a")[0].text.gsub("\n","").gsub("則評論","") : 0.to_s
-        trip_arr << tmp
 
+      if tripadvisor_link.include?("https")
+        doc2 = Nokogiri::HTML(open(tripadvisor_link))      
+        doc2.css("div.attraction_element").each_with_index do |a, i|
+          tmp = Hash.new
+          tmp["order"] = (i + 1).to_s
+          tmp["title"] = a.css("div.property_title a")[0].text
+          tmp["link"] = "https://www.tripadvisor.com.tw" + a.css("div.property_title a")[0]["href"]
+          tmp["rate"] = a.css("span.rate img")[0] ? a.css("span.rate img")[0]["alt"].gsub("分","") : 0.to_s
+          tmp["review"] = a.css("span.more a")[0] ? a.css("span.more a")[0].text.gsub("\n","").gsub("則評論","") : 0.to_s
+          trip_arr << tmp
+        end
       end
       trip_arr    
     else
