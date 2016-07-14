@@ -25,7 +25,11 @@ module Api
 		  	if @response["results"].count == 1 && (@place.nil? || (@place && !@search_area_condition))
 	    		@debug = 21
 		  	else 
-		  		@response = text_search(params[:str], params[:opt]) 
+		  		if @place
+		  			@response = text_search(@place["description"], params[:opt]) 
+		  		else
+		  			@response = text_search(params[:str], params[:opt]) 
+		  		end
 
 			    if @response["results"].count > 0 and @response["results"].count < 5 
 			    	@coordinate = get_geocode_by_pid(@place["place_id"]) if @place
@@ -41,6 +45,7 @@ module Api
 			    			@debug = 12
 			    		end
 			    	end   
+			    
 			    elsif @response["results"].count == 0
 			    	if @place
 			    		@coordinate = get_geocode_by_pid(@place["place_id"]) 
@@ -66,13 +71,14 @@ module Api
 					  	@response = text_search(english_name, params[:opt]) 	
 					  	@debug = 31
 				    end
-				  else
-				    @debug = 11
+					else
+						@debug = 11
 			    end
-			  end
+				end
 
 				@response["results"] = @response["results"].sort { |a,b| a["rating"] && b["rating"] ? b["rating"] <=> a["rating"] : a["rating"] ? -1 : 1}
 		  	chinese_results, english_results = google_translate(@response["results"].map{|r| r["name"]}) if @response["results"].count > 0
+		  	
 		  	@response["results"].each_with_index do |r, i|
 		  		r["ori_name"] = r["name"]
 		  		r["name"] = chinese_results[i]
@@ -81,7 +87,6 @@ module Api
 
 		  	tripadvisor_result = get_tripadvisor_info(params[:str])
 		  	@response["tripadvisor"] = tripadvisor_result
-
 
 		  	k = KeywordCount.find_by(keyword: params[:str], option: params[:opt])
 		  	if k
