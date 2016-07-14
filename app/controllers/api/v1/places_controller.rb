@@ -28,27 +28,18 @@ module Api
 		  		@response = text_search(params[:str], params[:opt]) 
 
 			    if @response["results"].count > 0 and @response["results"].count < 5 
-			    	@place1 = @place if @response["results"].count == 1
-			    	@place2 = auto_complete_by_keyword(params[:str])
-			    	@coordinate1 = get_geocode_by_pid(@place1["place_id"]) if @place1
-			    	@coordinate2 = get_geocode_by_pid(@place2["place_id"]) if @place2
-			    	@search_area_condition1 = @place1["types"].any? { |s| s.include?('administrative_area') || 
+			    	@coordinate = get_geocode_by_pid(@place["place_id"]) if @place
+			    	@search_area_condition = @place["types"].any? { |s| s.include?('administrative_area') || 
 			    																		 				  					s.include?('locality') ||
 			    																											  s.include?('postal_code')	|| 
-			    																		 									  s.include?('country')} if @place1
-			    	@search_area_condition2 = @place2["types"].any? { |s| s.include?('administrative_area') || 
-			    																											  s.include?('locality') ||
-			    																											  s.include?('postal_code')	|| 
-			    																											  s.include?('country')} if @place2																									
-			    	if @search_area_condition1
-			    		@response = nearby_search(@coordinate1["lat"], @coordinate1["lng"], params[:opt])		    
-			    		@debug = 12
-			    	elsif @search_area_condition2
-			    		@response = nearby_search(@coordinate2["lat"], @coordinate2["lng"], params[:opt])				    				
-			    		@debug = 13
-			    	else
-							@response["results"]
-							@debug = 14
+			    																		 									  s.include?('country')} if @place																								
+	    																											  
+			    	if @search_area_condition 
+			    		@response_new = nearby_search(@coordinate["lat"], @coordinate["lng"], params[:opt])		    
+			    		if @response_new["results"].count > @response["results"].count
+			    			@response = @response_new
+			    			@debug = 12
+			    		end
 			    	end   
 			    elsif @response["results"].count == 0
 			    	if @place
@@ -59,7 +50,7 @@ module Api
 				    																		 								  s.include?('country')} 
 				    	if @search_area_condition																	 								      		
 			    			@response = nearby_search(@coordinate["lat"], @coordinate["lng"], params[:opt])		
-			    			@debug = 15
+			    			@debug = 13
 			    		else
 				    		@response = Hash.new
 				    		@response["results"] = Array.new << get_place_detail(@place["place_id"])
