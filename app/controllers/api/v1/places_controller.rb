@@ -21,6 +21,7 @@ module Api
 	    																										  s.include?('postal_code')	|| 
 	    																		 								  s.include?('country')} if @place 
 @debug = 888
+
 		  	if @response["results"].count == 1 && (@place.nil? || (@place && !@search_area_condition))
 	    		@debug = 21
 		  	else 
