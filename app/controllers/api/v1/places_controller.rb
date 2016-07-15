@@ -21,7 +21,6 @@ module Api
 	    																										  s.include?('postal_code')	|| 
 	    																		 								  s.include?('country')} if @place 
 @debug = 888
-
 		  	if @response["results"].count == 1 && (@place.nil? || (@place && !@search_area_condition))
 	    		@debug = 21
 		  	else 
@@ -44,6 +43,8 @@ module Api
 			    			@response = @response_new
 			    			@debug = 12
 			    		end
+			    	else
+			    		@debug = 13
 			    	end   
 			    
 			    elsif @response["results"].count == 0
@@ -55,7 +56,7 @@ module Api
 				    																		 								  s.include?('country')} 
 				    	if @search_area_condition																	 								      		
 			    			@response = nearby_search(@coordinate["lat"], @coordinate["lng"], params[:opt])		
-			    			@debug = 13
+			    			@debug = 14
 			    		else
 				    		@response = Hash.new
 				    		@response["results"] = Array.new << get_place_detail(@place["place_id"])
