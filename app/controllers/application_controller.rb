@@ -128,6 +128,11 @@ class ApplicationController < ActionController::Base
     uri = URI.parse(encoded_url)    
     doc1 = Nokogiri::HTML(open(uri), nil, "big5")      
 
+  begin
+  rescue OpenURI::HTTPError
+    # do nothing. bypass error.
+  end  
+  
     tripadvisor_judge = "/url?q=https://www.tripadvisor.com.tw/Attractions"
     check = doc1.css("a").select{|a| [str,"大最佳旅遊景點"].all?{|s| a.children.text.include?(s)}}
 
