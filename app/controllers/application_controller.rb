@@ -130,9 +130,9 @@ class ApplicationController < ActionController::Base
 
   begin
   rescue OpenURI::HTTPError
-    # do nothing. bypass error.
+    p "google search crawl error"
   end  
-  
+
     tripadvisor_judge = "/url?q=https://www.tripadvisor.com.tw/Attractions"
     check = doc1.css("a").select{|a| [str,"大最佳旅遊景點"].all?{|s| a.children.text.include?(s)}}
 
