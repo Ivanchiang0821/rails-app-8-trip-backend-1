@@ -127,6 +127,7 @@ class ApplicationController < ActionController::Base
     encoded_url = URI.encode(google_link)
     uri = URI.parse(encoded_url)    
     doc1 = Nokogiri::HTML(open(uri), nil, "big5")      
+    p "crawl google search tripadvisor result"
 
   begin
   rescue OpenURI::HTTPError
