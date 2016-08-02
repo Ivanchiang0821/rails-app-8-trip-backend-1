@@ -50,7 +50,7 @@ class ApplicationController < ActionController::Base
 
       if result2["results"].count == 1 
         result2
-      elsif result1["results"].count || result1["results"].count >= result2["results"].count
+      elsif result1["results"].count && result1["results"].count >= result2["results"].count
         result1
       else
         result2
