@@ -8,7 +8,7 @@ default: &default
   adapter: postgresql
   encoding: utf8
   pool: 5
-  username: cychen
+  username: ivanchiang
   password:
 
 development:  
@@ -23,6 +23,6 @@ production:
   adapter: postgresql
   encoding: utf8
   pool: 5
-  username: cychen
+  username: ivanchiang
   password: 
   database: trip_api_production
