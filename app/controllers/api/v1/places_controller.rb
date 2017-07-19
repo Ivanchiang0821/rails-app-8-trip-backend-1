@@ -97,11 +97,12 @@ module Api
 		  		KeywordCount.create(keyword: params[:str], option: params[:opt], 
 		  			                  count: 1, debug: @debug, 
 		  			                  r_count: @response["results"].count, 
-		  			                  ta_count: 0, //@response["tripadvisor"].count, 
+		  			                  ta_count: 0,  
 		  			                  autocomplete: @place ? true : false)
 		  	end		  	
 		  end
 
+//ta_count: @response["tripadvisor"].count, 
 
 		  def search_by_pid
 		  	ApiCount.first.update(cnt_search_by_pid: ApiCount.first.cnt_search_by_pid+1)  
