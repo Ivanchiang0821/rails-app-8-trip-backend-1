@@ -87,8 +87,6 @@ module Api
 		  		r["eng_name"] = english_results[i]
 		  	end
 
-//		  	tripadvisor_result = get_tripadvisor_info(params[:str])
-//		  	@response["tripadvisor"] = tripadvisor_result
 
 		  	k = KeywordCount.find_by(keyword: params[:str], option: params[:opt])
 		  	if k
@@ -102,7 +100,7 @@ module Api
 		  	end		  	
 		  end
 
-//ta_count: @response["tripadvisor"].count, 
+
 
 		  def search_by_pid
 		  	ApiCount.first.update(cnt_search_by_pid: ApiCount.first.cnt_search_by_pid+1)  
