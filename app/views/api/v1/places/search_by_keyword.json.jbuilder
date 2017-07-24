@@ -34,14 +34,3 @@ else
 	end
 end
 
-if @response["tripadvisor"].count > 0
-	json.tripadvisor do |json|
-		json.array!(@response["tripadvisor"]) do |t|
-			json.order    t["order"]
-			json.title    t["title"]
-			json.link     t["link"]
-			json.rate     t["rate"]
-			json.review   t["review"]
-		end
-	end
-end
